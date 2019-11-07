@@ -252,18 +252,24 @@ class Train():
     def monitor(self, thread):
         """ Monitor the console, and generate + monitor preview if requested """
         is_preview = self.args.preview
+        non_terminal = self.args.non_terminal
         logger.debug("Launching Monitor")
         logger.info("===================================================")
         logger.info("  Starting")
         if is_preview:
             logger.info("  Using live preview")
-        logger.info("  Press '%s' to save and quit",
-                    "Terminate" if self.args.redirect_gui else "ENTER")
-        if not self.args.redirect_gui:
+        if not non_terminal:
+            logger.info("  Press '%s' to save and quit",
+                        "Terminate" if self.args.redirect_gui else "ENTER")
+        if not self.args.redirect_gui and not non_terminal:
             logger.info("  Press 'S' to save model weights immediately")
         logger.info("===================================================")
 
-        keypress = KBHit(is_gui=self.args.redirect_gui)
+        if not non_terminal:
+            keypress = KBHit(is_gui=self.args.redirect_gui)
+        else:
+            keypress = None
+
         err = False
         while True:
             try:
@@ -292,7 +298,7 @@ class Train():
                     self.save_now = True
 
                 # Console Monitor
-                if keypress.kbhit():
+                if not non_terminal and keypress.kbhit():
                     console_key = keypress.getch()
                     if console_key in ("\n", "\r"):
                         logger.debug("Exit requested")
@@ -305,7 +311,8 @@ class Train():
             except KeyboardInterrupt:
                 logger.debug("Keyboard Interrupt received")
                 break
-        keypress.set_normal_term()
+        if not non_terminal:
+            keypress.set_normal_term()
         logger.debug("Closed Monitor")
         return err
 

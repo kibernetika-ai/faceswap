@@ -1221,6 +1221,12 @@ class TrainArgs(FaceSwapArgs):
                               "group": "preview",
                               "default": False,
                               "help": "Show training preview output. in a separate window."})
+        argument_list.append({"opts": ("-nt", "--non-terminal"),
+                              "action": "store_true",
+                              "dest": "non_terminal",
+                              "group": "preview",
+                              "default": False,
+                              "help": "Don't use keypress reading as for TTY (used in scripts)."})
         argument_list.append({"opts": ("-w", "--write-image"),
                               "action": "store_true",
                               "dest": "write_image",
